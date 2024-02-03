@@ -1,0 +1,7 @@
+[
+    "google.com",
+    "https://example.com",
+    "http://expired.badssl.com",
+    "wrong.host.badssl.com",
+    "randomprot://facebook.com"
+]
