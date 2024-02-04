@@ -2,6 +2,7 @@ package service
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -23,4 +24,25 @@ func TestGetCertSHA1Fingerprint(t *testing.T) {
 	// assert
 	assert.NoError(t, err)
 	assert.Equal(t, expectedFp, actualFp)
+}
+
+func TestGetDaysToExpire(t *testing.T) {
+	// arrange
+	testCases :=  map[string]struct {
+		currentTime func() time.Time
+		expected int
+	} {
+		"valid certificate": {func() time.Time {return time.Date(2024, time.May, 4, 0, 0, 0, 0, time.UTC)}, 31},
+		"expired certificate": {func() time.Time {return time.Date(2025, time.May, 4, 0, 0, 0, 0, time.UTC)}, -334},
+	}
+	validToDate := time.Date(2024, time.June, 4, 0, 0, 0, 0, time.UTC)
+	
+	for _, tc := range testCases {
+		// act
+		actual := daysToExpire(validToDate, tc.currentTime)
+
+		// assert
+		assert.Equal(t, tc.expected, actual)
+	}
+
 }

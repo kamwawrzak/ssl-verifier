@@ -80,8 +80,8 @@ func getCertSHA1Fingerprint(cert *x509.Certificate) (string, error) {
 	return buf.String(), nil
 }
 
-func daysToExpire(validTo time.Time) int {
-	durationToExpire := validTo.Sub(time.Now())
+func daysToExpire(validTo time.Time, currentTime func() time.Time) int {
+	durationToExpire := validTo.Sub(currentTime())
 	return int(durationToExpire.Hours() / 24)
 }
 

@@ -1,7 +1,10 @@
 package service
 
-import "github.com/kamwawrzak/sslverifier/internal/model"
+import (
+	"time"
 
+	"github.com/kamwawrzak/sslverifier/internal/model"
+)
 
 var expiredCertMessage = "The certificate is expired"
 
@@ -43,7 +46,7 @@ func verify(url string) (*model.Result, error) {
 
 	isExpired := isExpired(cert.NotAfter)
 	isValid, validityError := verifyCertChain(certs)
-	daysToExpire := daysToExpire(cert.NotAfter)
+	daysToExpire := daysToExpire(cert.NotAfter, time.Now)
 
 	fingerPrint, err := getCertSHA1Fingerprint(cert)
 	if err != nil {
