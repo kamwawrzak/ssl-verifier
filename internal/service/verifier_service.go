@@ -1,6 +1,10 @@
 package service
 
-import "github.com/kamwawrzak/sslverifier/internal/model"
+import (
+	"log"
+
+	"github.com/kamwawrzak/sslverifier/internal/model"
+)
 
 
 var expiredCertMessage = "The certificate is expired"
@@ -40,6 +44,7 @@ func verify(url string) (*model.Result, error) {
 
 	// get leaf certificate
 	cert := certs[0]
+	log.Printf("Cert: %+v \n", cert)
 
 	isExpired := isExpired(cert.NotAfter)
 	isValid, validityError := verifyCertChain(certs)

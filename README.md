@@ -6,12 +6,12 @@
 `make build`
 
 ### Running
-Single url
+* Single url
 `make run-single url=<url to test>`
 
 For instance: `make run-single url=example.com`
 
-Batch of urls from json file (Example json in `/examples`)
+* Batch of urls from json file (Example json in `/examples`)
 
 `make run-batch input=<path_to_input_file> output=<path_to_output_file>`
 
