@@ -15,7 +15,7 @@ func GetCertificate(filePath string) (*x509.Certificate, error) {
 
 	block, _ := pem.Decode(cerData)
 	if block == nil {
-		return nil, errors.New("failed to decode certificate")
+		return nil, errors.New("failed decoding certificate")
 	}
 
 	return x509.ParseCertificate(block.Bytes)
