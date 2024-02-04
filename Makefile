@@ -13,3 +13,7 @@ run-batch:
 .PHONY: build-docker
 build-docker:
 	docker build . -t ssl-verifier:latest
+
+.PHONY: test
+test:
+	go test ./...
