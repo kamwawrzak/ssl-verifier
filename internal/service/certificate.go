@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-var trustedRootCAsPath = "./trusted-certs.pem"
-
 func getCertificates(target string) ([]*x509.Certificate, error) {
 	connCfg := &tls.Config{
 		InsecureSkipVerify: true,
@@ -27,8 +25,8 @@ func getCertificates(target string) ([]*x509.Certificate, error) {
 }
 
 
-func verifyCertChain(certs []*x509.Certificate) (bool, error) {
-	rootCAs, err := getTrustedRootCAs()
+func verifyCertChain(certs []*x509.Certificate, rootCertsPath string) (bool, error) {
+	rootCAs, err := getTrustedRootCAs(rootCertsPath)
 	if err != nil {
 		return false, err
 	}
@@ -51,19 +49,12 @@ func verifyCertChain(certs []*x509.Certificate) (bool, error) {
 	return true, nil
 }
 
-func getTrustedRootCAs() (*x509.CertPool, error) {
-	rootCAs, err := x509.SystemCertPool()
+func getTrustedRootCAs(rootCAsPath string) (*x509.CertPool, error) {
+	rootCAs, err := GetRootCAsFromFile(rootCAsPath)
 	if err != nil {
 		return nil, err
 	}
-
-	// if there are no RootCAs in SystemCertPool read it from file
-	if len(rootCAs.Subjects()) < 1 {
-		rootCAs, err = GetRootCAsFromFile(trustedRootCAsPath)
-		if err != nil {
-			return nil, err
-		}
-	}
+	
 	return rootCAs, nil
 }
 
@@ -80,13 +71,13 @@ func getCertSHA1Fingerprint(cert *x509.Certificate) (string, error) {
 	return buf.String(), nil
 }
 
-func daysToExpire(validTo time.Time, currentTime func() time.Time) int {
-	durationToExpire := validTo.Sub(currentTime())
+func daysToExpire(validTo, currentTime time.Time) int {
+	durationToExpire := validTo.Sub(currentTime)
 	return int(durationToExpire.Hours() / 24)
 }
 
-func isExpired(validTo time.Time) bool {
-	return validTo.Before(time.Now())
+func isExpired(validTo, currentTime time.Time) bool {
+	return validTo.Before(currentTime)
 }
 
 func getIntermediateCerts(certs []*x509.Certificate) *x509.CertPool {

@@ -7,6 +7,7 @@ import (
 )
 
 var expiredCertMessage = "The certificate is expired"
+var trustedRootCAsPath = "./trusted-certs.pem"
 
 type certificateVerifier struct {}
 
@@ -44,9 +45,9 @@ func verify(url string) (*model.Result, error) {
 	// get leaf certificate
 	cert := certs[0]
 
-	isExpired := isExpired(cert.NotAfter)
-	isValid, validityError := verifyCertChain(certs)
-	daysToExpire := daysToExpire(cert.NotAfter, time.Now)
+	isExpired := isExpired(cert.NotAfter, time.Now())
+	isValid, validityError := verifyCertChain(certs, trustedRootCAsPath)
+	daysToExpire := daysToExpire(cert.NotAfter, time.Now())
 
 	fingerPrint, err := getCertSHA1Fingerprint(cert)
 	if err != nil {
