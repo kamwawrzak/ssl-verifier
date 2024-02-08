@@ -17,3 +17,9 @@ build-docker:
 .PHONY: test
 test:
 	go test ./...
+
+.PHONY: test-coverage
+test-coverage:
+	@mkdir -p tests-results
+	@go test -coverprofile=tests-results/coverage.out ./...
+	@go tool cover -html=tests-results/coverage.out
