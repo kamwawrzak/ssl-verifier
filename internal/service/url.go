@@ -10,7 +10,7 @@ var defaultPort = "443"
 
 func getHostAndPort(rawURL string) (host string, port string, err error) {
 	// imitate scheme to satisfy url parser
-	if !hasSchema(rawURL) {
+	if !hasScheme(rawURL) {
 		rawURL = "//" + rawURL
 	}
 	parsedURL, err := url.Parse(rawURL)
@@ -20,7 +20,7 @@ func getHostAndPort(rawURL string) (host string, port string, err error) {
 	return parsedURL.Hostname(), parsedURL.Port(), nil
 }
 
-func hasSchema(url string) bool {
+func hasScheme(url string) bool {
 	pattern := regexp.MustCompile(`^\w+://`)
 	return pattern.MatchString(url)
 }

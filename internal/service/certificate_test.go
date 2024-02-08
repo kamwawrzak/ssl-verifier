@@ -96,12 +96,14 @@ func TestVerifyCertsChainCorrectChain(t *testing.T) {
 	certs, err := testhelper.GetCertificatesChain(correctCertChainPath)
 	require.NoError(t, err)
 
+	expected := true
+
 	// act
 	actual, err := verifyCertChain(certs, trustedCertsPath)
 
 	// assert
 	assert.NoError(t, err)
-	assert.Equal(t, true, actual)
+	assert.Equal(t, expected, actual)
 }
 
 func TestVerifyCertsChainInvalidChain(t *testing.T) {
@@ -109,10 +111,12 @@ func TestVerifyCertsChainInvalidChain(t *testing.T) {
 	certs, err := testhelper.GetCertificatesChain(incompleteCertChainPath)
 	require.NoError(t, err)
 
+	expected := false
+
 	// act
 	actual, err := verifyCertChain(certs, trustedCertsPath)
 
 	// assert
 	assert.Error(t, err)
-	assert.Equal(t, false, actual)
+	assert.Equal(t, expected, actual)
 }
