@@ -12,7 +12,10 @@ func main(){
 	input := flag.String("input", "", "path to input json file")
 	output := flag.String("output", "", "path for outoput json file")
 	flag.Parse()
-	verifier := service.NewCertificateVerifier()
+
+	dialer := service.NewTcpDialer("tcp")
+	verifier := service.NewCertificateVerifier(dialer)
+
 	if (*url != "") {
 		result, err := verifier.VerifySingle(*url)
 		if err != nil {

@@ -3,16 +3,11 @@ package service
 import (
 	"bytes"
 	"crypto/sha1"
-	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"strings"
 	"time"
 )
-
-type dialer interface {
-	Dial(target string) (*tls.Conn, error)
-}
 
 func getCertificates(target string, dialer dialer) ([]*x509.Certificate, error) {	
 	conn, err := dialer.Dial(target)
