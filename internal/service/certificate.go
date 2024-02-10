@@ -3,19 +3,14 @@ package service
 import (
 	"bytes"
 	"crypto/sha1"
-	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"strings"
 	"time"
 )
 
-func getCertificates(target string) ([]*x509.Certificate, error) {
-	connCfg := &tls.Config{
-		InsecureSkipVerify: true,
-	}
-	
-	conn, err := tls.Dial("tcp", target, connCfg)
+func getCertificates(target string, dialer dialer) ([]*x509.Certificate, error) {	
+	conn, err := dialer.Dial(target)
 	if err != nil {
 		return nil, err
 	}

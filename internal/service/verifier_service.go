@@ -9,20 +9,24 @@ import (
 var expiredCertMessage = "The certificate is expired"
 var trustedRootCAsPath = "./trusted-certs.pem"
 
-type certificateVerifier struct {}
-
-func NewCertificateVerifier()*certificateVerifier{
-	return &certificateVerifier{}
+type CertificateVerifier struct {
+	dialer dialer
 }
 
-func (certificateVerifier) VerifySingle(url string) (*model.Result, error) {
-	return verify(url)
+func NewCertificateVerifier(dialer dialer)*CertificateVerifier{
+	return &CertificateVerifier{
+		dialer: dialer,
+	}
 }
 
-func (certificateVerifier) VerifyBatch(urls []string) ([]*model.Result, error) {
+func (c *CertificateVerifier) VerifySingle(url string) (*model.Result, error) {
+	return c.verify(url)
+}
+
+func (c *CertificateVerifier) VerifyBatch(urls []string) ([]*model.Result, error) {
 	results := make([]*model.Result, 0, len(urls))
 	for _, url := range urls {
-		res, err := verify(url)
+		res, err := c.verify(url)
 		if err != nil {
 			return nil, err
 		}
@@ -32,12 +36,12 @@ func (certificateVerifier) VerifyBatch(urls []string) ([]*model.Result, error) {
 }
 
 
-func verify(url string) (*model.Result, error) {
+func (c *CertificateVerifier) verify(url string) (*model.Result, error) {
 	target, err := getTargetAddress(url)
 	if err != nil {
 		return nil, err
 	}
-	certs, err := getCertificates(target)
+	certs, err := getCertificates(target, c.dialer)
 	if err != nil {
 		return nil, err
 	}
