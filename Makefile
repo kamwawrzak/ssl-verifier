@@ -1,3 +1,5 @@
+port ?= 8080
+
 .PHONY: build
 build:
 	cd cmd && go build -o ../bin/ssl-verifier
@@ -9,6 +11,10 @@ run-single:
 .PHONY: run-batch
 run-batch:
 	./bin/ssl-verifier -input ${input} -output ${output}
+
+.PHONY: run-server
+run-server:
+	./bin/ssl-verifier -server -port ${port}
 
 .PHONY: build-docker
 build-docker:

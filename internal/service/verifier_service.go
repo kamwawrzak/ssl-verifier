@@ -1,6 +1,7 @@
 package service
 
 import (
+	"crypto/tls"
 	"time"
 
 	"github.com/kamwawrzak/sslverifier/internal/model"
@@ -8,6 +9,11 @@ import (
 
 var expiredCertMessage = "The certificate is expired"
 var trustedRootCAsPath = "./trusted-certs.pem"
+
+
+type dialer interface {
+	Dial(target string) (*tls.Conn, error)
+}
 
 type CertificateVerifier struct {
 	dialer dialer
@@ -19,7 +25,7 @@ func NewCertificateVerifier(dialer dialer)*CertificateVerifier{
 	}
 }
 
-func (c *CertificateVerifier) VerifySingle(url string) (*model.Result, error) {
+func (c *CertificateVerifier) Verify(url string) (*model.Result, error) {
 	return c.verify(url)
 }
 
