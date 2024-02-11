@@ -5,7 +5,17 @@
 ### Build 
 `make build`
 
-### Running
+### Running as HTTP server
+Run on default port 8080
+`make run-server`
+
+If you want to change port use:
+`make run-server port=<port>`
+
+Example request for localhost:
+`curl -X POST -d '{"urls": ["example.com", "https://google.com"]}' localhost:8080/verify`
+
+### Running as CLI
 * Single url
 `make run-single url=<url to test>`
 
