@@ -1,0 +1,21 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: circleci/golang:latest
+
+    steps:
+      - checkout
+      - run:
+          name: Install linter
+          command: go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+      - run:
+          name: Run lint
+          command: golangci-lint run
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - test
