@@ -76,7 +76,7 @@ func TestGetIntermediateCerts(t *testing.T) {
 	actual := getIntermediateCerts(certs)
 
 	// assert
-	assert.Equal(t, 2, len(actual.Subjects()))
+	assert.Equal(t, 2, len(actual.Subjects())) // nolint - certs don't come from SystemCertPool
 }
 
 func TestGetRootCAs(t *testing.T) {
@@ -88,7 +88,7 @@ func TestGetRootCAs(t *testing.T) {
 
 	// assert
 	assert.NoError(t, err)
-	assert.Equal(t, expectedLen, len(rootCAs.Subjects()))
+	assert.Equal(t, expectedLen, len(rootCAs.Subjects())) // nolint - certs don't come from SystemCertPool
 }
 
 func TestVerifyCertsChainCorrectChain(t *testing.T) {

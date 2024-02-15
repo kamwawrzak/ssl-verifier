@@ -24,7 +24,7 @@ func main(){
 	dialer := service.NewTcpDialer("tcp")
 	verifier := service.NewCertificateVerifier(dialer)
 
-	if serverFlag == true {
+	if serverFlag {
 		handler := server.NewVerifyHandler(verifier)
 		server := server.NewServer(port, handler)
 		log.Printf("Starting http server on port: %d ...", port)

@@ -4,11 +4,11 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
-	"io/ioutil"
+	"os"
 )
 
 func GetCertificate(filePath string) (*x509.Certificate, error) {
-	cerData, err := ioutil.ReadFile(filePath)
+	cerData, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func GetCertificate(filePath string) (*x509.Certificate, error) {
 }
 
 func GetCertificatesChain(filePath string) ([]*x509.Certificate, error) {
-	certData, err := ioutil.ReadFile(filePath)
+	certData, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
