@@ -14,7 +14,9 @@ jobs:
       - run:
           name: Run lint
           command: golangci-lint run
-
+      - run:
+          name: Run unit tests
+          command: make test
 workflows:
   version: 2
   build:
