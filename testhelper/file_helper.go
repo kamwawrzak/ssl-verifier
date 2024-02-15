@@ -3,14 +3,13 @@ package testhelper
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/kamwawrzak/sslverifier/internal/model"
 )
 
 func GetResultsFromFile(path string) ([]*model.Result, error){
-	file, err := ioutil.ReadFile(path)
+	file, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

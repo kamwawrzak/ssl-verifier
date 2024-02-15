@@ -3,7 +3,7 @@ package service
 import (
 	"crypto/x509"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 
 	"github.com/kamwawrzak/sslverifier/internal/model"
 )
@@ -11,7 +11,7 @@ import (
 type URLs []string 
 
 func GetUrls(path string) (URLs, error) {
-	jsonData, err := ioutil.ReadFile(path)
+	jsonData, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func SaveResults(path string, results []*model.Result) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(path, jsonData, 0644)
+	err = os.WriteFile(path, jsonData, 0644)
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func SaveResults(path string, results []*model.Result) error {
 }
 
 func GetRootCAsFromFile(path string) (*x509.CertPool, error) {
-	caBundle, err := ioutil.ReadFile(path)
+	caBundle, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
