@@ -12,7 +12,8 @@ var trustedRootCAsPath = "./trusted-certs.pem"
 
 
 type dialer interface {
-	Dial(target string) (*tls.Conn, error)
+	Dial(target string) (tlsConn, error)
+	GetConnectionState(conn tlsConn) tls.ConnectionState
 }
 
 type CertificateVerifier struct {
