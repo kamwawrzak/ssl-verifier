@@ -8,8 +8,6 @@ import (
 )
 
 var expiredCertMessage = "The certificate is expired"
-var trustedRootCAsPath = "./trusted-certs.pem"
-
 
 type dialer interface {
 	Dial(target string) (tlsConn, error)
@@ -17,11 +15,13 @@ type dialer interface {
 }
 
 type CertificateVerifier struct {
+	trustedCertsPath string
 	dialer dialer
 }
 
-func NewCertificateVerifier(dialer dialer)*CertificateVerifier{
+func NewCertificateVerifier(dialer dialer, trustedCertsPath string)*CertificateVerifier{
 	return &CertificateVerifier{
+		trustedCertsPath: trustedCertsPath,
 		dialer: dialer,
 	}
 }
@@ -57,7 +57,7 @@ func (c *CertificateVerifier) verify(url string) (*model.Result, error) {
 	cert := certs[0]
 
 	isExpired := isExpired(cert.NotAfter, time.Now())
-	isValid, validityError := verifyCertChain(certs, trustedRootCAsPath)
+	isValid, validityError := verifyCertChain(certs, c.trustedCertsPath)
 	daysToExpire := daysToExpire(cert.NotAfter, time.Now())
 
 	fingerPrint, err := getCertSHA1Fingerprint(cert)
