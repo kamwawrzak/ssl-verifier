@@ -16,7 +16,7 @@ func getCertificates(target string, dialer dialer) ([]*x509.Certificate, error) 
 	}
 	defer conn.Close()
 
-	return conn.ConnectionState().PeerCertificates, nil
+	return dialer.GetConnectionState(conn).PeerCertificates, nil
 }
 
 
