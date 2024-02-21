@@ -2,10 +2,11 @@
 
 ## Run locally
 
-### Build 
-`make build`
+### Build server and cli binary
+`make build-all`
 
 ### Running as HTTP server
+**On localhost**
 Run on default port 8080
 `make run-server`
 

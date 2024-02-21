@@ -6,6 +6,6 @@ COPY go.mod ./
 RUN go mod download
 
 COPY . .
-RUN make build
+RUN make build-server
 
-ENTRYPOINT [ "./bin/ssl-verifier" ]
+ENTRYPOINT [ "./bin/ssl-verifier-server" ]
