@@ -27,7 +27,8 @@ Build binary
 
 For instance: `make run-single url=example.com`
 
-**Test batch of urls from json file (Example json in `/examples`)**  
+**Test batch of urls from json file**  
 `make run-batch input=<path_to_input_file> output=<path_to_output_file>`
 
-For instance: `make run-batch input=examples/test_urls.json output=test-results.json`
+For instance: `make run-batch input=examples/test_urls.json output=test-results.json`  
+Example json file is in `/examples`.
