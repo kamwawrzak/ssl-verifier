@@ -2,18 +2,22 @@
 
 ## Run locally
 
-### Build server and cli binary
+### Build server and cli binaries
 `make build-all`
 
-### Running as HTTP server
+### Running HTTP server
 **On localhost**
-Run on default port 8080
-`make run-server`
+Run ssl-verifier (port value by default is set to 8080)
+`make run-server port=<optional_port_value>`
 
-If you want to change port use:
-`make run-server port=<port>`
+**In docker container**
+Build docker image
+`make build-docker`
 
-Example request for localhost:
+Run docker container (port value by default is set to 8080)
+`make run-docker-server port=<optional_port_value>`
+
+**Example request**
 `curl -X POST -d '{"urls": ["example.com", "https://google.com"]}' localhost:8080/verify`
 
 ### Running as CLI

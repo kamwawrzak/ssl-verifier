@@ -27,6 +27,10 @@ run-server:
 build-docker:
 	docker build . -t ssl-verifier:latest
 
+.PHONY: run-docker-server
+run-docker-server:
+	docker run --name ssl-verifier -p ${port}:8080 ssl-verifier:latest
+
 .PHONY: test
 test:
 	go test ./...
