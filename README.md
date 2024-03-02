@@ -20,9 +20,9 @@ Run docker container (port value by default is set to 8080)
 
 ## Run CLI
 Build binary  
-`make build-cli
+`make build-cli`
 
-** Test single url**    
+**Test single url**    
 `make run-single url=<url to test>`
 
 For instance: `make run-single url=example.com`
