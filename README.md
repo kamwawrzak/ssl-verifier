@@ -9,7 +9,7 @@ Run ssl-verifier (port value by default is set to 8080)
 `make run-server port=<optional_port_value>`
 
 **In docker container**  
-Build docker image
+Build docker image  
 `make build-docker`
 
 Run docker container (port value by default is set to 8080)  
