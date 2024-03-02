@@ -8,7 +8,7 @@ import (
 		"github.com/kamwawrzak/sslverifier/internal/service"
 )
 
-var defaultPort = 8089
+var defaultPort = 8080
 var trustedRootCAsPath = "./trusted-certs.pem"
 
 func main() {
