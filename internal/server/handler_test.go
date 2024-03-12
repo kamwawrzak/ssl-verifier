@@ -12,14 +12,20 @@ import (
 
 	"github.com/kamwawrzak/sslverifier/internal/model"
 	"github.com/kamwawrzak/sslverifier/internal/service"
+	"github.com/kamwawrzak/sslverifier/testhelper"
+
 )
 
-var certChainPath = "../../test-certs/correct-chain-example.cer"
-var trustedRootCAsPath = "../../trusted-certs.pem"
+var trustedRootCAsPath = "../../test-files/test-trusted-certs.pem"
 
 func TestVerifyCertificate(t *testing.T){
 	// arrange
-	dialer := service.NewDialerMock(certChainPath)
+	certGen, err := testhelper.NewCertificateGenerator()
+	require.NoError(t, err)
+	certs, err := certGen.GetValidCertChain()
+	require.NoError(t, err)
+
+	dialer := service.NewDialerMock(certs)
 	verifier := service.NewCertificateVerifier(dialer, trustedRootCAsPath)
 	handler := NewVerifyHandler(verifier)
 
@@ -52,6 +58,7 @@ func TestVerifyCertificate(t *testing.T){
 	var actual response
 	err = json.NewDecoder(recorder.Body).Decode(&actual)
 	require.NoError(t, err)
+
 
 	// assert
 	assert.Equal(t, http.StatusOK, recorder.Code)

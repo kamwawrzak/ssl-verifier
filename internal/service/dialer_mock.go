@@ -2,23 +2,22 @@ package service
 
 import (
 	"crypto/tls"
-	"log"
+	"crypto/x509"
 	"net"
 
 	"github.com/kamwawrzak/sslverifier/mocks"
-	"github.com/kamwawrzak/sslverifier/testhelper"
 )
 
 
 type dialerMock struct {
-	certChainPath string
+	certsChain []*x509.Certificate
 	localAddr *net.TCPAddr
 	remoteAddr *net.TCPAddr
 }
 
-func NewDialerMock(certChainPath string) *dialerMock {
-	return &dialerMock{ 
-		certChainPath: certChainPath,
+func NewDialerMock(certs []*x509.Certificate) *dialerMock {
+	return &dialerMock{
+		certsChain: certs,
 		localAddr: &net.TCPAddr{IP: net.IPv4(0, 0, 0, 0), Port: 443},
 		remoteAddr: &net.TCPAddr{IP: net.IPv4(0, 0, 0, 0), Port: 443},
 	}
@@ -29,10 +28,5 @@ func (d dialerMock) Dial(target string) (tlsConn, error){
 }
 
 func (d dialerMock) GetConnectionState(conn tlsConn) tls.ConnectionState {
-	certs, err := testhelper.GetCertificatesChain(d.certChainPath)
-	if err != nil {
-		log.Printf("Error during reading certs chain: %v", err)
-		return tls.ConnectionState{}
-	}
-	return tls.ConnectionState{PeerCertificates: certs}
+	return tls.ConnectionState{PeerCertificates: d.certsChain}
 }
