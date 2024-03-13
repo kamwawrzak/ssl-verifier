@@ -43,3 +43,18 @@ func GetRSAPrivateKeyFromFile(path string) (*rsa.PrivateKey, error) {
 func CleanTestFile(path string) {
 	os.Remove(path)
 }
+
+func saveCertToPEM(cert *x509.Certificate, filename string) error {
+    certOut, err := os.Create(filename)
+    if err != nil {
+        return err
+    }
+    defer certOut.Close()
+
+    err = pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+    if err != nil {
+        return err
+    }
+
+    return nil
+}

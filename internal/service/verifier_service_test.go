@@ -2,6 +2,7 @@ package service
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,9 +15,10 @@ var trustedCerts = "../../test-trusted-certs.pem"
 
 func TestVerifySuccess(t *testing.T) {
 	// arrange
-	certGen, err := testhelper.NewCertificateGenerator()
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.org", notAfter)
 	require.NoError(t, err)
-	certs, err := certGen.GetValidCertChain()
+	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
 	dialer := NewDialerMock(certs)
@@ -33,14 +35,15 @@ func TestVerifySuccess(t *testing.T) {
 	//assert
 	assert.NoError(t, err)
 	assert.Equal(t, expected.InputURL, actual.InputURL)
-	//assert.Equal(t, expected.Domain, actual.Domain)
+	assert.Equal(t, expected.Domain, actual.Domain)
 }
 
 func TestVerifyBatchSuccess(t *testing.T) {
 	// arrange
-	certGen, err := testhelper.NewCertificateGenerator()
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.org", notAfter)
 	require.NoError(t, err)
-	certs, err := certGen.GetValidCertChain()
+	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
 	dialer := NewDialerMock(certs)
@@ -63,5 +66,5 @@ func TestVerifyBatchSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, len(expected), len(actual))
 	assert.Equal(t, expected[1].InputURL, actual[1].InputURL)
-	//assert.Equal(t, expected[0].Domain, actual[0].Domain)
+	assert.Equal(t, expected[0].Domain, actual[0].Domain)
 }

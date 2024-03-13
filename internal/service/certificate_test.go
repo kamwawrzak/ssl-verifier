@@ -16,12 +16,13 @@ const (
 
 func TestGetCertSHA1Fingerprint(t *testing.T) {
 	// arrange
-	certGen, err := testhelper.NewCertificateGenerator()
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.com", notAfter)
 	require.NoError(t, err)
-	certs, err := certGen.GetValidCertChain()
+	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
-	expectedFp := "27:C6:26:E3:FF:9A:BC:FE:7E:E7:8B:85:63:19:33:DC:7F:01:F7:59"
+	expectedFp := "4A:44:02:CA:57:EF:77:25:14:62:E7:BC:A2:48:8E:90:2D:0B:F4:32"
 
 	// act
 	actualFp, err := getCertSHA1Fingerprint(certs[0])
@@ -68,9 +69,10 @@ func TestIsExpired(t *testing.T) {
 
 func TestGetIntermediateCerts(t *testing.T) {
 	// arrange
-	certGen, err := testhelper.NewCertificateGenerator()
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.com", notAfter)
 	require.NoError(t, err)
-	certs, err := certGen.GetValidCertChain()
+	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
 	// act
@@ -94,9 +96,10 @@ func TestGetRootCAs(t *testing.T) {
 
 func TestVerifyCertsChainCorrectChain(t *testing.T) {
 	// arrange
-	certGen, err := testhelper.NewCertificateGenerator()
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.com", notAfter)
 	require.NoError(t, err)
-	certs, err := certGen.GetValidCertChain()
+	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
 	expected := true
@@ -111,17 +114,18 @@ func TestVerifyCertsChainCorrectChain(t *testing.T) {
 
 func TestVerifyCertsChainInvalidChain(t *testing.T) {
 	// arrange
-	certGen, err := testhelper.NewCertificateGenerator()
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.com", notAfter)
 	require.NoError(t, err)
-	certs, err := certGen.GetValidCertChain()
+	certs, err := certGen.GetCertChain(false)
 	require.NoError(t, err)
 
-	expected := true
+	expected := false
 
 	// act
-	actual, _ := verifyCertChain(certs, trustedCertsPath)
+	actual, err := verifyCertChain(certs, trustedCertsPath)
 
 	// assert
-	//assert.Error(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, expected, actual)
 }

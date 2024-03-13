@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,17 +17,18 @@ import (
 
 )
 
-var trustedRootCAsPath = "../../test-files/test-trusted-certs.pem"
+var trustedCertsPath = "../../test-files/test-trusted-certs.pem"
 
-func TestVerifyCertificate(t *testing.T){
+func TestVerifyValidCertificate(t *testing.T){
 	// arrange
-	certGen, err := testhelper.NewCertificateGenerator()
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.org", notAfter)
 	require.NoError(t, err)
-	certs, err := certGen.GetValidCertChain()
+	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
 	dialer := service.NewDialerMock(certs)
-	verifier := service.NewCertificateVerifier(dialer, trustedRootCAsPath)
+	verifier := service.NewCertificateVerifier(dialer, trustedCertsPath)
 	handler := NewVerifyHandler(verifier)
 
 	reqInput := requestInput{Urls: []string{"example.com"}}

@@ -5,62 +5,65 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/pem"
 	"math/big"
-	"os"
 	"time"
 )
 
-var (
-	rsaKeyPath = "../../test-files/test-rsa-private-key.pem"
-	testRootCertsPath = "../../test-files/test-trusted-certs.pem"
-)
+var rsaKeyPath = "../../test-files/test-rsa-private-key.pem"
+
 
 type CertificateGenerator struct {
+	rootCertsPath string
 	privRootKey *rsa.PrivateKey
 	privKey *rsa.PrivateKey
 	notBefore time.Time
+	leafCertCN string
+	leafNotAfter time.Time
 }
 
-func NewCertificateGenerator() (*CertificateGenerator, error) {
+func NewCertificateGenerator(rootCertsPath, leafCertCN string, leafNotAfter time.Time) (*CertificateGenerator, error) {
 	privKey, err := GetRSAPrivateKeyFromFile(rsaKeyPath)
 	if err != nil {
 		return nil, err
 	}
 
 	return &CertificateGenerator{
+		rootCertsPath: rootCertsPath,
 		privRootKey: privKey,
 		privKey: privKey,
 		notBefore: time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
+		leafCertCN: leafCertCN,
+		leafNotAfter: leafNotAfter,
 	}, nil
 }
 
-func (c *CertificateGenerator) GetValidCertChain() ([]*x509.Certificate, error) {
+func (c *CertificateGenerator) GetCertChain(valid bool) ([]*x509.Certificate, error) {
 	notAfter := time.Date(2100, 1, 30, 0, 0, 0, 0, time.UTC)
-	leafNotAfter := time.Date(2099, 1, 30, 0, 0, 0, 0, time.UTC)
 	rootTmpl, err := c.createRootCert()
 	if err != nil {
 		return  nil, err
 	}
 
-	interTmpl, err := c.createCert(2, "Intermediate CA", notAfter, rootTmpl, c.privRootKey)
+	interTmpl, err := c.createCert(2, "Intermediate Cert", notAfter, rootTmpl, c.privRootKey)
 	if err != nil {
 		return nil, err
 	}
 
 	
-	leafTmpl, err := c.createCert(3, "Leaf certificate", leafNotAfter, interTmpl, c.privKey)
+	leafTmpl, err := c.createCert(3, "Leaf Cert", c.leafNotAfter, interTmpl, c.privKey)
 	if err != nil {
 		return nil, err
 	}
 
 	// create certs chain
-	certsTmpl := []*x509.Certificate{leafTmpl, interTmpl, rootTmpl}
+	if !valid {
+		return []*x509.Certificate{leafTmpl, rootTmpl}, nil
+	}
 
-	return certsTmpl, nil
+	return []*x509.Certificate{leafTmpl, interTmpl, rootTmpl}, nil
 } 
 
-
+// generated RootCert is common for all tests
 func (c *CertificateGenerator) createRootCert() (*x509.Certificate, error) {
 	notAfter := time.Date(2100, 1, 30, 0, 0, 0, 0, time.UTC)
 	rootTmpl := x509.Certificate{
@@ -86,7 +89,10 @@ func (c *CertificateGenerator) createRootCert() (*x509.Certificate, error) {
 	}
 
 	// save cert to file
-	saveCertToPEM(rootCert, testRootCertsPath)
+	err = saveCertToPEM(rootCert, c.rootCertsPath)
+	if err != nil {
+		return nil, err
+	}
 
 	return rootCert, nil
 }
@@ -95,7 +101,7 @@ func (c *CertificateGenerator) createCert(serialNum int64, org_name string, expi
 	certTmpl := x509.Certificate{
 		SerialNumber: big.NewInt(serialNum),
 		Subject: pkix.Name{
-			CommonName: "www.example.org",
+			CommonName: c.leafCertCN,
 			Organization: []string{org_name},
 		},
 		NotBefore:             c.notBefore,
@@ -118,19 +124,3 @@ func (c *CertificateGenerator) createCert(serialNum int64, org_name string, expi
 
 	return cert, nil
 }
-
-func saveCertToPEM(cert *x509.Certificate, filename string) error {
-    certOut, err := os.Create(filename)
-    if err != nil {
-        return err
-    }
-    defer certOut.Close()
-
-    err = pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
-    if err != nil {
-        return err
-    }
-
-    return nil
-}
-
