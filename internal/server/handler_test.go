@@ -13,6 +13,7 @@ import (
 
 	"github.com/kamwawrzak/sslverifier/internal/model"
 	"github.com/kamwawrzak/sslverifier/internal/service"
+	"github.com/kamwawrzak/sslverifier/mocks"
 	"github.com/kamwawrzak/sslverifier/testhelper"
 
 )
@@ -27,7 +28,7 @@ func TestVerifyValidCertificate(t *testing.T){
 	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
-	dialer := service.NewDialerMock(certs)
+	dialer := mocks.NewDialerMock(certs)
 	verifier := service.NewCertificateVerifier(dialer, trustedCertsPath)
 	handler := NewVerifyHandler(verifier)
 

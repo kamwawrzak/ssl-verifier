@@ -2,21 +2,10 @@ package service
 
 import (
 	"crypto/tls"
-	"net"
-	"time"
+
+	"github.com/kamwawrzak/sslverifier/internal/conn"
 )
 
-type tlsConn interface {
-	Read(b []byte) (int, error)
-	Write(b []byte) (int, error)
-	Close() error
-	LocalAddr() net.Addr
-	RemoteAddr() net.Addr
-	SetDeadline(t time.Time) error
-	SetReadDeadline(t time.Time) error
-	SetWriteDeadline(t time.Time) error
-	ConnectionState() tls.ConnectionState
-}
 
 type tcpDialer struct {
 	protocol string
@@ -32,10 +21,10 @@ func NewTcpDialer(protocol string) *tcpDialer {
 	}
 }
 
-func (t *tcpDialer) Dial(target string) (tlsConn, error){
+func (t *tcpDialer) Dial(target string) (conn.TlsConn, error){
 	return tls.Dial(t.protocol, target, t.cfg)
 }
 
-func (t *tcpDialer) GetConnectionState(conn tlsConn) tls.ConnectionState {
+func (t *tcpDialer) GetConnectionState(conn conn.TlsConn) tls.ConnectionState {
 	return conn.ConnectionState()
 }
