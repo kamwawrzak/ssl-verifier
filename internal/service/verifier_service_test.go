@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/kamwawrzak/sslverifier/internal/model"
+	"github.com/kamwawrzak/sslverifier/mocks"
 	"github.com/kamwawrzak/sslverifier/testhelper"
 )
 
@@ -21,7 +22,7 @@ func TestVerifySuccess(t *testing.T) {
 	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
-	dialer := NewDialerMock(certs)
+	dialer := mocks.NewDialerMock(certs)
 	verifier := NewCertificateVerifier(dialer, trustedCerts)
 
 	expected := model.Result{
@@ -46,7 +47,7 @@ func TestVerifyBatchSuccess(t *testing.T) {
 	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
-	dialer := NewDialerMock(certs)
+	dialer := mocks.NewDialerMock(certs)
 	verifier := NewCertificateVerifier(dialer, trustedCerts)
 	inputUrls := []string{"example.com", "http://example.com"}
 	expected := []model.Result{

@@ -1,13 +1,12 @@
-package service
+package mocks
 
 import (
 	"crypto/tls"
 	"crypto/x509"
 	"net"
-
-	"github.com/kamwawrzak/sslverifier/mocks"
+	
+	"github.com/kamwawrzak/sslverifier/internal/conn"
 )
-
 
 type dialerMock struct {
 	certsChain []*x509.Certificate
@@ -23,10 +22,10 @@ func NewDialerMock(certs []*x509.Certificate) *dialerMock {
 	}
 }	
 
-func (d dialerMock) Dial(target string) (tlsConn, error){
-	return mocks.NewMockTLSConn(d.localAddr, d.remoteAddr), nil
+func (d dialerMock) Dial(target string) (conn.TlsConn, error){
+	return NewMockTLSConn(d.localAddr, d.remoteAddr), nil
 }
 
-func (d dialerMock) GetConnectionState(conn tlsConn) tls.ConnectionState {
+func (d dialerMock) GetConnectionState(conn conn.TlsConn) tls.ConnectionState {
 	return tls.ConnectionState{PeerCertificates: d.certsChain}
 }

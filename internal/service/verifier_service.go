@@ -4,14 +4,15 @@ import (
 	"crypto/tls"
 	"time"
 
+	"github.com/kamwawrzak/sslverifier/internal/conn"
 	"github.com/kamwawrzak/sslverifier/internal/model"
 )
 
 var expiredCertMessage = "The certificate is expired"
 
 type dialer interface {
-	Dial(target string) (tlsConn, error)
-	GetConnectionState(conn tlsConn) tls.ConnectionState
+	Dial(target string) (conn.TlsConn, error)
+	GetConnectionState(conn conn.TlsConn) tls.ConnectionState
 }
 
 type CertificateVerifier struct {
