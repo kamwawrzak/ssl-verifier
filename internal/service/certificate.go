@@ -34,7 +34,6 @@ func verifyCertChain(certs []*x509.Certificate, rootCertsPath string) (bool, err
 	for _, cert := range certs {
 		_, err = cert.Verify(opts)
 		if err != nil {
-			fmt.Printf("~~~~~~fail for cert: %+v \n", cert.SerialNumber)
 			// ignore error caused by expired certificate
 			if strings.Contains(err.Error(), "has expired") {
 				continue

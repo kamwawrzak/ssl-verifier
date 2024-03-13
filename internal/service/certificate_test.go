@@ -10,9 +10,7 @@ import (
 	"github.com/kamwawrzak/sslverifier/testhelper"
 )
 
-const (
-	trustedCertsPath = "../../test-files/test-trusted-certs.pem"
-) 
+var trustedCertsPath = "../../test-files/test-trusted-certs.pem"
 
 func TestGetCertSHA1Fingerprint(t *testing.T) {
 	// arrange
