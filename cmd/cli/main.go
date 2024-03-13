@@ -1,10 +1,10 @@
 package main
 
 import (
-		"flag"
-		"log"
+	"flag"
+	"log"
 
-		"github.com/kamwawrzak/sslverifier/internal/service"
+	"github.com/kamwawrzak/sslverifier/internal/service"
 )
 
 var trustedRootCAsPath = "./trusted-certs.pem"
