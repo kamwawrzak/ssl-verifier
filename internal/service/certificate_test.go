@@ -110,7 +110,7 @@ func TestVerifyCertsChainCorrectChain(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func TestVerifyCertsChainInvalidChain(t *testing.T) {
+func TestVerifyInvalidCertsChain(t *testing.T) {
 	// arrange
 	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
 	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.com", notAfter)
