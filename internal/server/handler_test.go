@@ -6,21 +6,29 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/kamwawrzak/sslverifier/internal/model"
 	"github.com/kamwawrzak/sslverifier/internal/service"
+	"github.com/kamwawrzak/sslverifier/testhelper"
+
 )
 
-var certChainPath = "../../test-certs/correct-chain-example.cer"
-var trustedRootCAsPath = "../../trusted-certs.pem"
+var trustedCertsPath = "../../test-files/test-trusted-certs.pem"
 
-func TestVerifyCertificate(t *testing.T){
+func TestVerifyValidCertificate(t *testing.T){
 	// arrange
-	dialer := service.NewDialerMock(certChainPath)
-	verifier := service.NewCertificateVerifier(dialer, trustedRootCAsPath)
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.org", notAfter)
+	require.NoError(t, err)
+	certs, err := certGen.GetCertChain(true)
+	require.NoError(t, err)
+
+	dialer := service.NewDialerMock(certs)
+	verifier := service.NewCertificateVerifier(dialer, trustedCertsPath)
 	handler := NewVerifyHandler(verifier)
 
 	reqInput := requestInput{Urls: []string{"example.com"}}
@@ -52,6 +60,7 @@ func TestVerifyCertificate(t *testing.T){
 	var actual response
 	err = json.NewDecoder(recorder.Body).Decode(&actual)
 	require.NoError(t, err)
+
 
 	// assert
 	assert.Equal(t, http.StatusOK, recorder.Code)

@@ -10,22 +10,20 @@ import (
 	"github.com/kamwawrzak/sslverifier/testhelper"
 )
 
-const (
-	correctCertPath = "../../test-certs/correct-example.cer"
-	correctCertChainPath = "../../test-certs/correct-chain-example.cer"
-	incompleteCertChainPath = "../../test-certs/incomplete-chain-example.cer"
-	trustedCertsPath = "../../trusted-certs.pem"
-) 
+var trustedCertsPath = "../../test-files/test-trusted-certs.pem"
 
 func TestGetCertSHA1Fingerprint(t *testing.T) {
 	// arrange
-	cert, err := testhelper.GetCertificate(correctCertPath)
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.com", notAfter)
+	require.NoError(t, err)
+	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
-	expectedFp := "4D:A2:5A:6D:5E:F6:2C:5F:95:C7:BD:0A:73:EA:3C:17:7B:36:99:9D"
+	expectedFp := "4A:44:02:CA:57:EF:77:25:14:62:E7:BC:A2:48:8E:90:2D:0B:F4:32"
 
 	// act
-	actualFp, err := getCertSHA1Fingerprint(cert)
+	actualFp, err := getCertSHA1Fingerprint(certs[0])
 
 	// assert
 	assert.NoError(t, err)
@@ -69,7 +67,10 @@ func TestIsExpired(t *testing.T) {
 
 func TestGetIntermediateCerts(t *testing.T) {
 	// arrange
-	certs, err := testhelper.GetCertificatesChain(correctCertChainPath)
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.com", notAfter)
+	require.NoError(t, err)
+	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
 	// act
@@ -81,7 +82,7 @@ func TestGetIntermediateCerts(t *testing.T) {
 
 func TestGetRootCAs(t *testing.T) {
 	// arrange
-	expectedLen := 140
+	expectedLen := 1
 
 	// act
 	rootCAs, err := getTrustedRootCAs(trustedCertsPath)
@@ -93,7 +94,10 @@ func TestGetRootCAs(t *testing.T) {
 
 func TestVerifyCertsChainCorrectChain(t *testing.T) {
 	// arrange
-	certs, err := testhelper.GetCertificatesChain(correctCertChainPath)
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.com", notAfter)
+	require.NoError(t, err)
+	certs, err := certGen.GetCertChain(true)
 	require.NoError(t, err)
 
 	expected := true
@@ -108,7 +112,10 @@ func TestVerifyCertsChainCorrectChain(t *testing.T) {
 
 func TestVerifyCertsChainInvalidChain(t *testing.T) {
 	// arrange
-	certs, err := testhelper.GetCertificatesChain(incompleteCertChainPath)
+	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
+	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.com", notAfter)
+	require.NoError(t, err)
+	certs, err := certGen.GetCertChain(false)
 	require.NoError(t, err)
 
 	expected := false

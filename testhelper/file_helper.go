@@ -1,7 +1,10 @@
 package testhelper
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"os"
 
@@ -23,6 +26,35 @@ func GetResultsFromFile(path string) ([]*model.Result, error){
 	return res, nil
 }
 
+func GetRSAPrivateKeyFromFile(path string) (*rsa.PrivateKey, error) {
+    pemData, err := os.ReadFile(path)
+    if err != nil {
+        return nil, err
+    }
+
+    block, _ := pem.Decode(pemData)
+    if block == nil {
+        return nil, fmt.Errorf("failed to decode PEM block")
+    }
+
+    return x509.ParsePKCS1PrivateKey(block.Bytes)
+}
+
 func CleanTestFile(path string) {
 	os.Remove(path)
+}
+
+func saveCertToPEM(cert *x509.Certificate, filename string) error {
+    certOut, err := os.Create(filename)
+    if err != nil {
+        return err
+    }
+    defer certOut.Close()
+
+    err = pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+    if err != nil {
+        return err
+    }
+
+    return nil
 }
