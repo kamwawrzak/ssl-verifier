@@ -3,27 +3,25 @@ package server
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/go-chi/chi"
 )
 
 type Server struct {
 	port int
-	router chi.Router
+	mux *http.ServeMux
 	handler *verifyHandler
 }
 
 func NewServer(port int, handler *verifyHandler) *Server {
 	return &Server{
 		port: port,
-		router: chi.NewRouter(),
+		mux: http.NewServeMux(),
 		handler: handler,
 	}
 }
 
 func (s *Server) Start() error {
 	s.registerEndpoints()
-	err := http.ListenAndServe(fmt.Sprintf(":%d", s.port), s.router)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", s.port), s.mux)
 	if err != nil {
 		return fmt.Errorf("failed to start server %v", err)
 	}
@@ -31,5 +29,5 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) registerEndpoints() {
-	s.router.Post("/verify", s.handler.verifyCertificate)
+	s.mux.HandleFunc("POST /verify", s.handler.verifyCertificate)
 }
