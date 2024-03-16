@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -22,6 +23,7 @@ var trustedCertsPath = "../../test-files/test-trusted-certs.pem"
 
 func TestVerifyValidCertificate(t *testing.T){
 	// arrange
+	log, _ := test.NewNullLogger()
 	notAfter := time.Date(2099, 1, 1, 0, 0, 0, 0, time.UTC)
 	certGen, err := testhelper.NewCertificateGenerator(trustedCertsPath, "www.example.org", notAfter)
 	require.NoError(t, err)
@@ -30,7 +32,7 @@ func TestVerifyValidCertificate(t *testing.T){
 
 	dialer := mocks.NewDialerMock(certs)
 	verifier := service.NewCertificateVerifier(dialer, trustedCertsPath)
-	handler := NewVerifyHandler(verifier)
+	handler := NewVerifyHandler(log, verifier)
 
 	reqInput := requestInput{Urls: []string{"example.com"}}
 	jsonBody, err := json.Marshal(reqInput)

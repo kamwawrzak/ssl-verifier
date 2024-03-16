@@ -2,8 +2,9 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/kamwawrzak/sslverifier/internal/model"
 )
@@ -13,11 +14,13 @@ type certVerifier interface {
 }
 
 type verifyHandler struct {
+	log *logrus.Logger
 	verifier certVerifier
 }
 
-func NewVerifyHandler(verifier certVerifier) *verifyHandler {
+func NewVerifyHandler(log *logrus.Logger, verifier certVerifier) *verifyHandler {
 	return &verifyHandler{
+		log: log,
 		verifier: verifier,
 	}
 }
@@ -34,14 +37,16 @@ type response struct {
 func (h *verifyHandler) verifyCertificate(w http.ResponseWriter, r *http.Request) {
 	var input requestInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, fmt.Sprintf("Failed to decode JSON: %v", err), http.StatusBadRequest)
+		h.log.WithError(err).Error("Decode JSON failed")
+		http.Error(w, "Failed to decode JSON", http.StatusBadRequest)
 		return
 	}
 	var results []*model.Result
 	for _, url := range input.Urls {
 		res, err := h.verifier.Verify(url)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to verify certificate: %v", err), http.StatusInternalServerError)
+			h.log.WithError(err).Error("Certificate verification failed")
+			http.Error(w, "Unexpected error occurred", http.StatusInternalServerError)
 			return
 		}
 		results = append(results, res)
@@ -53,7 +58,8 @@ func (h *verifyHandler) verifyCertificate(w http.ResponseWriter, r *http.Request
 
 	err := json.NewEncoder(w).Encode(resp)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to verify certificate: %v", err), http.StatusInternalServerError)
+		h.log.WithError(err).Error("Encode JSON failed")
+		http.Error(w, "Unexpected error occurred", http.StatusInternalServerError)
 		return
 	}
 }
