@@ -2,7 +2,8 @@ package main
 
 import (
 	"flag"
-	"log"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/kamwawrzak/sslverifier/internal/server"
 	"github.com/kamwawrzak/sslverifier/internal/service"
@@ -16,15 +17,17 @@ func main() {
 	flag.IntVar(&port, "port", defaultPort, "http server port" )
 	flag.Parse()
 
+	log := logrus.New()
+
 	dialer := service.NewTcpDialer("tcp")
 	verifier := service.NewCertificateVerifier(dialer, trustedRootCAsPath)
 
 	handler := server.NewVerifyHandler(verifier)
 	server := server.NewServer(port, handler)
 
-	log.Printf("Starting http server on port: %d ...", port)
+	log.WithField("port", port).Info("Starting http server")
 	err := server.Start()
 	if err != nil {
-		log.Println(err)
+		log.WithError(err).Fatal("Starting server failed")
 	}
 }
