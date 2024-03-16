@@ -22,7 +22,7 @@ func main() {
 	dialer := service.NewTcpDialer("tcp")
 	verifier := service.NewCertificateVerifier(dialer, trustedRootCAsPath)
 
-	handler := server.NewVerifyHandler(verifier)
+	handler := server.NewVerifyHandler(log, verifier)
 	server := server.NewServer(port, handler)
 
 	log.WithField("port", port).Info("Starting http server")
